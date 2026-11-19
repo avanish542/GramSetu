@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ complaint.ticket_number }} – Complaint Details{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Header Ticket Card -->
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4 mb-6">
+            <div>
+                <span class="text-xs font-mono font-bold text-civic-700 bg-civic-100 px-3 py-1 rounded-full">{{ complaint.ticket_number }}</span>
+                <h1 class="text-2xl font-bold text-gray-900 mt-2">{{ complaint.title }}</h1>
+                <p class="text-xs text-gray-500 mt-1">Category: {{ complaint.category.name }} • Ward: {{ complaint.ward.ward_name }}</p>
+            </div>
+            <span class="text-xs font-bold px-4 py-2 rounded-full text-white
+                {% if complaint.status == 'RESOLVED' %}bg-green-600{% elif complaint.status == 'IN_PROGRESS' %}bg-yellow-500{% else %}bg-blue-600{% endif %}">
+                {{ complaint.get_status_display }}
+            </span>
+        </div>
+
+        <div class="space-y-4 text-sm text-gray-700">
+            <div>
+                <h4 class="font-bold text-xs uppercase text-gray-400">Description</h4>
+                <p class="mt-1 leading-relaxed">{{ complaint.description }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-xs text-gray-600 pt-2 border-t">
+                <div><span class="font-bold">Location:</span> {{ complaint.location }}</div>
+                <div><span class="font-bold">Date Registered:</span> {{ complaint.created_at|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Workflow Stepper -->
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm mb-8">
+        <h3 class="text-base font-bold text-gray-900 mb-6">Complaint Status History</h3>
+        <div class="space-y-4">
+            {% for update in updates %}
+                <div class="flex space-x-4 items-start">
+                    <div class="w-8 h-8 rounded-full bg-civic-700 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex-grow text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-gray-900">
+                            <span>{{ update.get_status_display }}</span>
+                            <span class="text-gray-400 font-normal">{{ update.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <p class="text-gray-600">{{ update.note }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-xs text-gray-500">No status updates yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

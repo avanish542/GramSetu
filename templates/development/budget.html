@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Budget Transparency – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">Budget Transparency Dashboard</h1>
+        <p class="text-sm text-gray-600 mt-1">Complete financial overview of development funds, allocations, and expenditures in {{ DEMO_PANCHAYAT_NAME }} (Sahjanwa, Gorakhpur).</p>
+    </div>
+
+    <!-- Overview Counters -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Approved Budget</span>
+            <div class="text-2xl font-black text-gray-900 mt-1">₹{{ total_budget|floatformat:0 }}</div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Amount Spent</span>
+            <div class="text-2xl font-black text-green-600 mt-1">₹{{ total_spent|floatformat:0 }}</div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">Remaining Balance</span>
+            <div class="text-2xl font-black text-blue-600 mt-1">₹{{ remaining_budget|floatformat:0 }}</div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Projects</span>
+            <div class="text-2xl font-black text-purple-600 mt-1">{{ total_count }}</div>
+        </div>
+    </div>
+
+    <!-- Chart.js Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Chart 1: Budget by Category -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <h3 class="text-base font-bold text-gray-900 mb-4">Budget Allocation by Category</h3>
+            <div class="h-64">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+        <!-- Chart 2: Project Status Distribution -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <h3 class="text-base font-bold text-gray-900 mb-4">Project Status Overview</h3>
+            <div class="h-64 flex justify-center">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Table -->
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Category-Wise Financial Summary</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-700">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                    <tr>
+                        <th class="py-3 px-4">Category</th>
+                        <th class="py-3 px-4 text-right">Approved Budget (₹)</th>
+                        <th class="py-3 px-4 text-right">Amount Spent (₹)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for cat in category_data %}
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-gray-900">{{ cat.category__name }}</td>
+                            <td class="py-3 px-4 text-right font-semibold">₹{{ cat.total_budget|floatformat:2 }}</td>
+                            <td class="py-3 px-4 text-right font-semibold text-green-700">₹{{ cat.total_spent|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Category Chart
+        const catCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(catCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for cat in category_data %}'{{ cat.category__name }}',{% endfor %}],
+                datasets: [{
+                    label: 'Approved Budget (₹)',
+                    data: [{% for cat in category_data %}{{ cat.total_budget }},{% endfor %}],
+                    backgroundColor: '#15803d',
+                }, {
+                    label: 'Amount Spent (₹)',
+                    data: [{% for cat in category_data %}{{ cat.total_spent }},{% endfor %}],
+                    backgroundColor: '#2563eb',
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Status Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed ({{ completed_count }})', 'Ongoing ({{ ongoing_count }})', 'Planned/Approved'],
+                datasets: [{
+                    data: [{{ completed_count }}, {{ ongoing_count }}, {{ total_count }} - {{ completed_count }} - {{ ongoing_count }}],
+                    backgroundColor: ['#16a34a', '#eab308', '#3b82f6']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+</script>
+{% endblock %}

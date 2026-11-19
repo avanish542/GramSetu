@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}User Profile – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+        <div class="flex items-center space-x-4 border-b pb-6">
+            <div class="w-16 h-16 bg-civic-700 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="text-xs text-gray-500">Role: <span class="font-bold text-civic-700">{{ user.get_role_display }}</span> • Status: {% if user.is_verified %}<span class="text-green-600 font-bold">Verified Citizen</span>{% else %}Unverified{% endif %}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-700">
+            <div><span class="text-gray-500 block font-semibold">Username</span> {{ user.username }}</div>
+            <div><span class="text-gray-500 block font-semibold">Email</span> {{ user.email|default:'N/A' }}</div>
+            <div><span class="text-gray-500 block font-semibold">Phone</span> {{ user.phone|default:'N/A' }}</div>
+            <div><span class="text-gray-500 block font-semibold">Assigned Ward</span> {{ user.ward.ward_name|default:'N/A' }}</div>
+            <div><span class="text-gray-500 block font-semibold">Panchayat</span> {{ DEMO_PANCHAYAT_NAME }}</div>
+            <div><span class="text-gray-500 block font-semibold">Member Since</span> {{ user.created_at|date:"M d, Y" }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

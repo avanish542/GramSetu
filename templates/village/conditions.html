@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% block title %}Tenuhari Village Condition Overview – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Header Banner -->
+    <div class="bg-gradient-to-r from-civic-800 via-civic-900 to-gray-900 text-white rounded-3xl p-8 sm:p-10 mb-10 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 max-w-4xl space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="bg-civic-600/80 text-green-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Panchayat Analytics & Monitoring</span>
+                <span class="bg-blue-500/30 text-blue-200 border border-blue-400/40 text-xs font-semibold px-3 py-1 rounded-full"><i class="fas fa-map-marker-alt mr-1"></i> Sahjanwa Block, Gorakhpur</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black">Tenuhari Village Condition Overview</h1>
+            <p class="text-gray-200 text-sm sm:text-base font-light leading-relaxed">
+                Comprehensive development assessments across public infrastructure, roads, water supply, electricity, healthcare, digital connectivity, and civic facilities in Tenuhari (Shukla) and Sahjanwa region.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-4 text-xs">
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg"><i class="fas fa-database text-green-400 mr-1.5"></i> <strong>{{ verified_count }}</strong> Verified Records</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg"><i class="fas fa-vial text-yellow-400 mr-1.5"></i> <strong>{{ demo_count }}</strong> Sample Assessment Records</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Metrics Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-10">
+        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-black text-gray-900">{{ total_locations_assessed }}</span>
+            <span class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">Locations</span>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-black text-civic-700">{{ categories_assessed_count }}</span>
+            <span class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">Categories</span>
+        </div>
+        <div class="bg-green-50 p-4 rounded-2xl border border-green-200 text-center">
+            <span class="block text-2xl font-black text-green-700">{{ status_counts.GOOD }}</span>
+            <span class="text-[11px] text-green-800 font-bold uppercase tracking-wider">Good</span>
+        </div>
+        <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 text-center">
+            <span class="block text-2xl font-black text-blue-700">{{ status_counts.MODERATE }}</span>
+            <span class="text-[11px] text-blue-800 font-bold uppercase tracking-wider">Moderate</span>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-2xl border border-yellow-200 text-center">
+            <span class="block text-2xl font-black text-yellow-700">{{ status_counts.NEEDS_ATTENTION }}</span>
+            <span class="text-[11px] text-yellow-800 font-bold uppercase tracking-wider">Needs Attention</span>
+        </div>
+        <div class="bg-red-50 p-4 rounded-2xl border border-red-200 text-center">
+            <span class="block text-2xl font-black text-red-700">{{ status_counts.CRITICAL }}</span>
+            <span class="text-[11px] text-red-800 font-bold uppercase tracking-wider">Critical</span>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-2xl border border-gray-300 text-center">
+            <span class="block text-2xl font-black text-gray-700">{{ status_counts.UNKNOWN }}</span>
+            <span class="text-[11px] text-gray-600 font-bold uppercase tracking-wider">Unknown</span>
+        </div>
+    </div>
+
+    <!-- Chart.js Visualization Graphs -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+        <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center">
+                    <i class="fas fa-chart-pie text-civic-700 mr-2"></i> Condition Status Breakdown
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Overall condition distribution across assessed sectors</p>
+            </div>
+            <div class="relative flex justify-center items-center py-4">
+                <canvas id="statusChart" class="max-h-64"></canvas>
+            </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-600 mr-2"></i> Category Assessment Summary
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Sector-wise condition status distribution</p>
+            </div>
+            <div class="relative py-2">
+                <canvas id="categoryChart" class="max-h-64"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Cards Grid -->
+    <div class="mb-12">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-extrabold text-gray-900">Sectoral Condition Assessments</h2>
+                <p class="text-xs text-gray-500 mt-1">Detailed field evaluation for Tenuhari (Shukla) Gram Panchayat</p>
+            </div>
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="inline-flex items-center px-2.5 py-1 rounded border border-green-300 bg-green-50 text-green-800 font-semibold">
+                    <i class="fas fa-check-circle mr-1"></i> Verified Record
+                </span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded border border-yellow-300 bg-yellow-50 text-yellow-800 font-semibold">
+                    <i class="fas fa-vial mr-1"></i> Demo / Sample Data
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for item in all_conditions %}
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">
+                                    {% if item.village %}{{ item.village.name }}{% else %}{{ item.related_panchayat.name }}{% endif %}
+                                </span>
+                                <h3 class="text-lg font-extrabold text-gray-900">{{ item.category }}</h3>
+                            </div>
+
+                            {% if item.condition_status == 'GOOD' %}
+                                <span class="bg-green-100 text-green-800 text-[10px] font-extrabold px-3 py-1 rounded-full">GOOD</span>
+                            {% elif item.condition_status == 'MODERATE' %}
+                                <span class="bg-blue-100 text-blue-800 text-[10px] font-extrabold px-3 py-1 rounded-full">MODERATE</span>
+                            {% elif item.condition_status == 'NEEDS_ATTENTION' %}
+                                <span class="bg-yellow-100 text-yellow-800 text-[10px] font-extrabold px-3 py-1 rounded-full">NEEDS ATTENTION</span>
+                            {% elif item.condition_status == 'CRITICAL' %}
+                                <span class="bg-red-100 text-red-800 text-[10px] font-extrabold px-3 py-1 rounded-full">CRITICAL</span>
+                            {% else %}
+                                <span class="bg-gray-200 text-gray-700 text-[10px] font-extrabold px-3 py-1 rounded-full">UNKNOWN</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="text-xs text-gray-700 leading-relaxed mb-3">{{ item.description }}</p>
+                        {% if item.remarks %}
+                            <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-[11px] text-gray-600 mb-3">
+                                <strong>Remarks:</strong> {{ item.remarks }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-3 text-[10px] flex justify-between items-center text-gray-500">
+                        <span>Updated: {{ item.updated_at|date:"d M Y" }}</span>
+                        {% if item.verified %}
+                            <span class="text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-200"><i class="fas fa-check-circle mr-1"></i> VERIFIED</span>
+                        {% else %}
+                            <span class="text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200"><i class="fas fa-flask mr-1"></i> DEMO DATA</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-3 text-center py-12 bg-white rounded-3xl border border-gray-200 text-gray-500 text-sm">
+                    No sectoral condition assessments recorded yet.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Village/Location Comparative Matrix (Neutral, No Ranking) -->
+    <div class="mb-12">
+        <div class="mb-6">
+            <h2 class="text-2xl font-extrabold text-gray-900">Sahjanwa Block Comparative Location Matrix</h2>
+            <p class="text-xs text-gray-500 mt-1">Neutral overview of sector assessments across Tenuhari and Sahjanwa locations (without ranking)</p>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-4 px-6 font-bold">Location / Panchayat</th>
+                        <th class="py-4 px-4 font-bold">Category</th>
+                        <th class="py-4 px-4 font-bold">Roads</th>
+                        <th class="py-4 px-4 font-bold">Drainage</th>
+                        <th class="py-4 px-4 font-bold">Water</th>
+                        <th class="py-4 px-4 font-bold">Electricity</th>
+                        <th class="py-4 px-4 font-bold">Streetlights</th>
+                        <th class="py-4 px-4 font-bold">Schools</th>
+                        <th class="py-4 px-4 font-bold">Health</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for row in location_matrix %}
+                        <tr class="hover:bg-gray-50/80 transition">
+                            <td class="py-4 px-6 font-bold text-gray-900 whitespace-nowrap">{{ row.name }}</td>
+                            <td class="py-4 px-4 text-gray-500 whitespace-nowrap">{{ row.type }}</td>
+                            {% for cat_name in "Roads,Drainage,Drinking Water,Electricity,Street Lighting,Schools,Health Facilities"|make_list %}
+                            {% endfor %}
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Roads %}
+                                    <span class="font-bold text-[10px] uppercase {% if row.conditions_map.Roads.condition_status == 'GOOD' %}text-green-700{% elif row.conditions_map.Roads.condition_status == 'MODERATE' %}text-blue-700{% elif row.conditions_map.Roads.condition_status == 'NEEDS_ATTENTION' %}text-yellow-700{% elif row.conditions_map.Roads.condition_status == 'CRITICAL' %}text-red-700{% else %}text-gray-500{% endif %}">
+                                        {{ row.conditions_map.Roads.condition_status }}
+                                    </span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Drainage %}
+                                    <span class="font-bold text-[10px] uppercase {% if row.conditions_map.Drainage.condition_status == 'GOOD' %}text-green-700{% elif row.conditions_map.Drainage.condition_status == 'MODERATE' %}text-blue-700{% elif row.conditions_map.Drainage.condition_status == 'NEEDS_ATTENTION' %}text-yellow-700{% elif row.conditions_map.Drainage.condition_status == 'CRITICAL' %}text-red-700{% else %}text-gray-500{% endif %}">
+                                        {{ row.conditions_map.Drainage.condition_status }}
+                                    </span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Drinking_Water or row.conditions_map.Water %}
+                                    <span class="font-bold text-[10px] uppercase text-green-700">GOOD</span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Electricity %}
+                                    <span class="font-bold text-[10px] uppercase text-green-700">GOOD</span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Street_Lighting or row.conditions_map.Streetlighting %}
+                                    <span class="font-bold text-[10px] uppercase text-blue-700">MODERATE</span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Schools %}
+                                    <span class="font-bold text-[10px] uppercase text-green-700">GOOD</span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if row.conditions_map.Health_Facilities or row.conditions_map.Health %}
+                                    <span class="font-bold text-[10px] uppercase text-blue-700">MODERATE</span>
+                                {% else %}<span class="text-gray-300">-</span>{% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="py-6 text-center text-gray-500">No comparative location data available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Status Doughnut Chart
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Good', 'Moderate', 'Needs Attention', 'Critical', 'Unknown'],
+            datasets: [{
+                data: [
+                    {{ status_counts.GOOD }},
+                    {{ status_counts.MODERATE }},
+                    {{ status_counts.NEEDS_ATTENTION }},
+                    {{ status_counts.CRITICAL }},
+                    {{ status_counts.UNKNOWN }}
+                ],
+                backgroundColor: ['#22c55e', '#3b82f6', '#eab308', '#ef4444', '#9ca3af'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+        }
+    });
+
+    // 2. Category Bar Chart
+    const ctxCat = document.getElementById('categoryChart').getContext('2d');
+    const catLabels = [{% for item in category_summary %}'{{ item.category }}',{% endfor %}];
+    const goodData = [{% for item in category_summary %}{{ item.good }},{% endfor %}];
+    const modData = [{% for item in category_summary %}{{ item.moderate }},{% endfor %}];
+    const needsData = [{% for item in category_summary %}{{ item.needs_attention }},{% endfor %}];
+    const critData = [{% for item in category_summary %}{{ item.critical }},{% endfor %}];
+
+    new Chart(ctxCat, {
+        type: 'bar',
+        data: {
+            labels: catLabels,
+            datasets: [
+                { label: 'Good', data: goodData, backgroundColor: '#22c55e' },
+                { label: 'Moderate', data: modData, backgroundColor: '#3b82f6' },
+                { label: 'Needs Attention', data: needsData, backgroundColor: '#eab308' },
+                { label: 'Critical', data: critData, backgroundColor: '#ef4444' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { stacked: true, ticks: { font: { size: 10 } } },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

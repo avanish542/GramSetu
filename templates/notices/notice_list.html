@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Panchayat Notices & Announcements – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">Gram Panchayat Notice Board</h1>
+        <p class="text-sm text-gray-600 mt-1">Official announcements, Gram Sabha meeting schedules, emergency alerts, and health camps in {{ DEMO_VILLAGE_NAME }}.</p>
+    </div>
+
+    <div class="space-y-4 mb-12">
+        {% for notice in notices %}
+            <div class="p-6 rounded-2xl border bg-white shadow-sm hover:shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4
+                {% if notice.is_pinned %}border-l-4 border-l-red-500{% else %}border-gray-200{% endif %}">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded
+                            {% if notice.is_pinned %}bg-red-100 text-red-700{% else %}bg-civic-100 text-civic-800{% endif %}">
+                            {{ notice.get_category_display }}
+                        </span>
+                        <span class="text-xs text-gray-400">• {{ notice.published_at|date:"M d, Y" }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900">
+                        <a href="{% url 'notices:detail' notice.pk %}" class="hover:text-civic-700 transition">{{ notice.title }}</a>
+                    </h3>
+                    <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed max-w-3xl">{{ notice.description }}</p>
+                </div>
+                <a href="{% url 'notices:detail' notice.pk %}" class="flex-shrink-0 bg-gray-100 hover:bg-civic-50 text-civic-700 font-bold px-4 py-2 rounded-lg text-xs transition">
+                    Read Notice →
+                </a>
+            </div>
+        {% empty %}
+            <div class="text-center py-12 text-gray-500 bg-white rounded-2xl border">No notices published right now.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

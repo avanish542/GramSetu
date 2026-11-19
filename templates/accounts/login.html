@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Sign In – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-16">
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-lg space-y-6">
+        <div class="text-center">
+            <div class="w-12 h-12 bg-civic-700 text-white font-bold rounded-2xl flex items-center justify-center mx-auto text-xl shadow mb-3">GS</div>
+            <h1 class="text-2xl font-black text-gray-900">Sign In to GramSetu</h1>
+            <p class="text-xs text-gray-500 mt-1">Enter your credentials to access services & dashboards</p>
+        </div>
+
+        {% if debug or DEBUG %}
+        <!-- Quick Demo Credentials Selector Hint Box (Development Environment Only) -->
+        <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
+            <span class="font-bold block flex items-center text-amber-800">
+                <i class="fas fa-flask mr-1 text-amber-600"></i> Local Development / Testing Demo Credentials:
+            </span>
+            <div class="text-[11px] font-mono text-amber-900 leading-relaxed pt-1">
+                • Villager: username <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">ramesh</code> | password <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">pass12345</code><br>
+                • Sarpanch: username <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">sarpanch</code> | password <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">admin12345</code><br>
+                • Super Admin: username <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">admin</code> | password <code class="bg-amber-200/60 px-1.5 py-0.5 rounded">admin12345</code>
+            </div>
+            <span class="text-[10px] text-amber-700 italic block pt-1">Notice: Displayed only in DEBUG / local testing mode. Hidden automatically in production.</span>
+        </div>
+        {% endif %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Username</label>
+                {{ form.username }}
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Password</label>
+                {{ form.password }}
+            </div>
+            <button type="submit" class="w-full bg-civic-700 hover:bg-civic-800 text-white font-bold py-3 rounded-xl shadow text-sm transition">
+                Sign In to Dashboard
+            </button>
+        </form>
+
+        <div class="text-center border-t pt-4 text-xs text-gray-600">
+            Don't have an account? <a href="{% url 'accounts:register' %}" class="text-civic-700 font-bold hover:underline">Register as a Villager</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

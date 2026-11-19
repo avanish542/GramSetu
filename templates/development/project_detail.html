@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.name }} – Development Project Details{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumb -->
+    <nav class="flex text-xs text-gray-500 mb-6 space-x-2">
+        <a href="{% url 'development:list' %}" class="hover:underline">Projects</a>
+        <span>/</span>
+        <span class="font-semibold text-gray-800">{{ project.project_id }}</span>
+    </nav>
+
+    <!-- Header Box -->
+    <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="bg-civic-100 text-civic-800 text-xs font-bold px-3 py-1 rounded-full">{{ project.category.name }}</span>
+                    <span class="text-xs text-gray-500 font-mono">{{ project.project_id }}</span>
+                    <span class="text-xs text-gray-500">• {{ project.ward.ward_name|default:'All Wards' }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-gray-900">{{ project.name }}</h1>
+                <p class="text-sm text-gray-600 mt-2 max-w-3xl leading-relaxed">{{ project.description }}</p>
+            </div>
+            <div class="flex-shrink-0 text-right">
+                <span class="inline-block text-xs font-bold px-4 py-2 rounded-full shadow text-white mb-2
+                    {% if project.status == 'COMPLETED' %}bg-green-600{% elif project.status == 'IN_PROGRESS' %}bg-yellow-500{% else %}bg-blue-600{% endif %}">
+                    {{ project.get_status_display }}
+                </span>
+                <div class="text-xs text-gray-500">Contractor: <span class="font-bold text-gray-800">{{ project.contractor|default:'Panchayat Department' }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3 Cards: Budget Overview, Progress Bar, Timeline -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <!-- Card 1: Budget -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center space-x-2">
+                <i class="fas fa-wallet text-civic-700"></i>
+                <span>Budget Transparency</span>
+            </h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Approved Budget:</span>
+                    <span class="font-bold text-gray-900">₹{{ project.approved_budget|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Amount Spent:</span>
+                    <span class="font-bold text-green-600">₹{{ project.amount_spent|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between border-t pt-2">
+                    <span class="text-gray-500">Remaining Budget:</span>
+                    <span class="font-bold text-blue-600">₹{{ project.remaining_budget|floatformat:2 }}</span>
+                </div>
+                <div class="text-xs text-gray-500 pt-1">Funding: <span class="font-semibold">{{ project.funding_source }}</span></div>
+            </div>
+        </div>
+
+        <!-- Card 2: Progress -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center space-x-2">
+                <i class="fas fa-tasks text-yellow-600"></i>
+                <span>Completion Status</span>
+            </h3>
+            <div class="text-center py-2">
+                <span class="text-4xl font-extrabold text-civic-700">{{ project.progress_percentage }}%</span>
+                <span class="block text-xs text-gray-500 mt-1">Work Progress</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-civic-600 h-3 rounded-full" style="width: {{ project.progress_percentage }}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 pt-2">
+                <span>Start: {{ project.start_date|date:"M d, Y"|default:"TBD" }}</span>
+                <span>Expected: {{ project.expected_completion_date|date:"M d, Y"|default:"TBD" }}</span>
+            </div>
+        </div>
+
+        <!-- Card 3: Location Details -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center space-x-2">
+                <i class="fas fa-map-marker-alt text-red-600"></i>
+                <span>Location & Ward</span>
+            </h3>
+            <div class="space-y-2 text-sm text-gray-700">
+                <p><span class="text-gray-500">Location:</span> {{ project.location }}</p>
+                <p><span class="text-gray-500">Ward:</span> {{ project.ward.ward_name }}</p>
+                {% if project.latitude and project.longitude %}
+                    <p class="text-xs text-gray-500">Coordinates: {{ project.latitude }}, {{ project.longitude }}</p>
+                    <a href="{% url 'infrastructure:map' %}" class="inline-block mt-2 text-xs text-civic-700 font-bold hover:underline">View on Interactive Map →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Events -->
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm mb-12">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Project Execution Timeline</h3>
+        <div class="relative border-l-2 border-civic-600 ml-4 space-y-6">
+            {% for event in timeline %}
+                <div class="ml-6 relative">
+                    <span class="absolute -left-[31px] top-1 w-4 h-4 bg-civic-600 rounded-full border-2 border-white"></span>
+                    <span class="text-xs font-semibold text-civic-700">{{ event.event_date|date:"M d, Y" }}</span>
+                    <h4 class="text-base font-bold text-gray-900">{{ event.title }}</h4>
+                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">{{ event.description }}</p>
+                </div>
+            {% empty %}
+                <div class="ml-6 text-xs text-gray-500">No timeline events recorded yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Expenses Breakdown Table -->
+    {% if expenses %}
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm mb-12">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Itemized Expenditure Breakdown</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-700">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                    <tr>
+                        <th class="py-3 px-4">Date</th>
+                        <th class="py-3 px-4">Title</th>
+                        <th class="py-3 px-4">Invoice #</th>
+                        <th class="py-3 px-4 text-right">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for exp in expenses %}
+                        <tr>
+                            <td class="py-3 px-4 text-xs text-gray-500">{{ exp.spent_date|date:"M d, Y" }}</td>
+                            <td class="py-3 px-4 font-medium text-gray-900">{{ exp.title }}</td>
+                            <td class="py-3 px-4 font-mono text-xs">{{ exp.invoice_number|default:'N/A' }}</td>
+                            <td class="py-3 px-4 text-right font-bold text-green-700">₹{{ exp.amount|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Citizen Reviews & Feedback Section -->
+    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="text-xl font-bold text-gray-900">Verified Citizen Feedback</h3>
+                {% if avg_rating %}
+                    <p class="text-xs text-gray-500 mt-1">Average Citizen Rating: <span class="font-bold text-yellow-600 text-sm">{{ avg_rating }} / 5.0 ⭐</span></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Submit Feedback Form (If logged in & not submitted) -->
+        {% if user.is_authenticated and not user_has_submitted_feedback %}
+            <form action="{% url 'feedback:submit' project.pk %}" method="POST" class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8 space-y-4">
+                {% csrf_token %}
+                <h4 class="text-sm font-bold text-gray-900">Submit Your Project Rating & Feedback</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Rating (1 to 5 Stars)</label>
+                        <select name="rating" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ 4 - Good</option>
+                            <option value="3">⭐⭐⭐ 3 - Average</option>
+                            <option value="2">⭐⭐ 2 - Poor</option>
+                            <option value="1">⭐ 1 - Very Bad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Comment</label>
+                        <textarea name="comment" required rows="2" placeholder="Your review..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="bg-civic-700 text-white font-bold px-6 py-2 rounded-lg text-xs">Submit Feedback</button>
+            </form>
+        {% endif %}
+
+        <!-- Feedback List -->
+        <div class="space-y-4">
+            {% for fb in feedback_list %}
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-900">{{ fb.user.get_full_name|default:fb.user.username }}</span>
+                        <span class="text-yellow-500 font-bold">⭐ {{ fb.rating }}/5</span>
+                    </div>
+                    <p class="text-xs text-gray-600">{{ fb.comment }}</p>
+                    <span class="text-[10px] text-gray-400 block mt-2">{{ fb.created_at|date:"M d, Y" }}</span>
+                </div>
+            {% empty %}
+                <p class="text-xs text-gray-500 italic">No feedback submitted for this project yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

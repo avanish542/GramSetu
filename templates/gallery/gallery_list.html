@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Village Media Gallery – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">{{ DEMO_VILLAGE_NAME }} Village Media Gallery</h1>
+        <p class="text-sm text-gray-600 mt-1">Photos of development works, Gram Sabha meetings, cleanliness drives, and village cultural events.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {% for item in items %}
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                <div class="bg-gray-200 h-48 flex items-center justify-center text-gray-400 relative">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-image text-4xl"></i>
+                    {% endif %}
+                    <span class="absolute bottom-3 left-3 bg-gray-900/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded">
+                        {{ item.get_category_display }}
+                    </span>
+                </div>
+                <div class="p-4">
+                    <h3 class="text-sm font-bold text-gray-900">{{ item.title }}</h3>
+                    <p class="text-xs text-gray-600 mt-1">{{ item.caption }}</p>
+                    <span class="text-[10px] text-gray-400 block mt-2">{{ item.event_date|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-3 text-center py-12 text-gray-500">No gallery entries found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

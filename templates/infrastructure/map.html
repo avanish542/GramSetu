@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Interactive Village Infrastructure Map – GramSetu V2{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+    #villageMap { height: 600px; width: 100%; border-radius: 1.5rem; z-index: 1; min-height: 500px; background: #e5e7eb; }
+    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 4px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900">Interactive Infrastructure Map</h1>
+            <p class="text-sm text-gray-600 mt-1">
+                Geographic locations of public facilities, water tanks, primary school, health sub-centre, road projects, and solar lighting in <strong>Tenuhari (Shukla)</strong> (Sahjanwa, Gorakhpur - 273209).
+            </p>
+        </div>
+        <div class="flex items-center space-x-3 text-xs">
+            <span class="bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded-xl border border-green-200">
+                <i class="fas fa-map-pin mr-1 text-green-600"></i> Mapped Facilities: {{ mapped_count }}
+            </span>
+            {% if unmapped_count > 0 %}
+            <span class="bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-xl border border-amber-200">
+                <i class="fas fa-exclamation-triangle mr-1 text-amber-600"></i> Unmapped (Awaiting Survey): {{ unmapped_count }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Map Category Filter Bar -->
+    <div class="flex space-x-2 overflow-x-auto pb-4 mb-6 text-xs font-semibold scrollbar-none">
+        <button onclick="filterMarkers('ALL', this)" class="filter-btn active px-4 py-2 bg-civic-700 text-white rounded-xl shadow">All Facilities</button>
+        {% for code, name in categories %}
+            <button onclick="filterMarkers('{{ code }}', this)" class="filter-btn px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl whitespace-nowrap">{{ name }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Map Container Card -->
+    <div class="bg-white p-3 rounded-3xl border border-gray-200 shadow-md">
+        <div id="villageMap"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rawMarkersData = JSON.parse('{{ markers_json|escapejs }}');
+        let leafletMarkers = [];
+
+        // Center Leaflet map at Tenuhari/Sahjanwa coordinates (26.7725, 83.1783)
+        const map = L.map('villageMap', {
+            center: [26.7725, 83.1783],
+            zoom: 15,
+            scrollWheelZoom: true
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | GramSetu V2'
+        }).addTo(map);
+
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 200);
+
+        loadMarkers(rawMarkersData);
+
+        function loadMarkers(data) {
+            leafletMarkers.forEach(m => map.removeLayer(m.marker));
+            leafletMarkers = [];
+
+            data.forEach(item => {
+                if (!item.lat || !item.lng) return;
+
+                const popupContent = `
+                    <div style="font-family: system-ui; width: 230px; padding: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 10px; font-weight: bold; background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                                ${item.category_display}
+                            </span>
+                            <span style="font-size: 9px; font-weight: bold; color: #b45309; background: #fef3c7; padding: 1px 4px; border-radius: 3px;">
+                                SAMPLE DATA
+                            </span>
+                        </div>
+                        <h4 style="font-size: 14px; font-weight: bold; margin: 4px 0 2px 0; color: #111827;">${item.name}</h4>
+                        <p style="font-size: 11px; color: #4b5563; margin: 0 0 6px 0; line-height: 1.4;">${item.description || ''}</p>
+                        <div style="font-size: 10px; color: #6b7280; border-top: 1px solid #f3f4f6; padding-top: 4px; margin-top: 4px;">
+                            <strong>Ward:</strong> ${item.ward} | <strong>Status:</strong> ${item.status}
+                        </div>
+                    </div>
+                `;
+
+                const marker = L.marker([item.lat, item.lng]).addTo(map).bindPopup(popupContent);
+                leafletMarkers.push({ category: item.category, marker: marker });
+            });
+        }
+
+        window.filterMarkers = function(catCode, btnElem) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-civic-700', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            btnElem.classList.add('bg-civic-700', 'text-white');
+
+            leafletMarkers.forEach(obj => {
+                if (catCode === 'ALL' || obj.category === catCode) {
+                    map.addLayer(obj.marker);
+                } else {
+                    map.removeLayer(obj.marker);
+                }
+            });
+        };
+    });
+</script>
+{% endblock %}

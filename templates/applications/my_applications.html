@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}My Applications – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900">
+                {% if user.is_panchayat_admin %}Panchayat Service Applications Desk{% else %}My Service Applications{% endif %}
+            </h1>
+            <p class="text-sm text-gray-600 mt-1">Track verification progress, status updates, and download approved certificates.</p>
+        </div>
+        <a href="{% url 'services:list' %}" class="bg-civic-700 hover:bg-civic-800 text-white font-bold px-6 py-2.5 rounded-xl shadow text-sm">
+            Apply for New Service
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="GET" class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Search by App ID or Applicant name..." class="w-full px-3 py-2 border rounded-lg text-sm">
+        </div>
+        <div>
+            <select name="status" class="w-full px-3 py-2 border rounded-lg text-sm">
+                <option value="">All Statuses</option>
+                {% for code, name in status_choices %}
+                    <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex items-end space-x-2">
+            <button type="submit" class="bg-civic-700 text-white font-bold px-6 py-2 rounded-lg text-sm">Filter</button>
+            <a href="{% url 'applications:my_applications' %}" class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm">Reset</a>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-700">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                    <tr>
+                        <th class="py-3 px-4">Application ID</th>
+                        <th class="py-3 px-4">Service Name</th>
+                        <th class="py-3 px-4">Applicant</th>
+                        <th class="py-3 px-4">Date Submitted</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for app in applications %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-3 px-4 font-mono font-bold text-civic-700">{{ app.application_number }}</td>
+                            <td class="py-3 px-4 font-medium text-gray-900">{{ app.service.name }}</td>
+                            <td class="py-3 px-4 text-xs text-gray-600">{{ app.applicant_name }} ({{ app.applicant_phone }})</td>
+                            <td class="py-3 px-4 text-xs text-gray-500">{{ app.created_at|date:"M d, Y" }}</td>
+                            <td class="py-3 px-4">
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full text-white
+                                    {% if app.status == 'APPROVED' %}bg-green-600
+                                    {% elif app.status == 'REJECTED' %}bg-red-600
+                                    {% elif app.status == 'UNDER_VERIFICATION' %}bg-yellow-500
+                                    {% else %}bg-blue-600{% endif %}">
+                                    {{ app.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <a href="{% url 'applications:detail' app.pk %}" class="text-xs font-bold text-civic-700 hover:underline">View Application →</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="text-center py-8 text-gray-500">No applications found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin System Dashboard – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-gray-900 text-white rounded-3xl p-8 mb-8 shadow-xl">
+        <h1 class="text-3xl font-black">Super Admin System Dashboard</h1>
+        <p class="text-xs text-gray-400 mt-1">Multi-village system administration, security audit logs, user management.</p>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-2xl border text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Total Registered Users</span>
+            <span class="block text-3xl font-black text-gray-900 mt-1">{{ total_users }}</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Total Villagers</span>
+            <span class="block text-3xl font-black text-civic-700 mt-1">{{ total_villagers }}</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Panchayat Admins</span>
+            <span class="block text-3xl font-black text-blue-600 mt-1">{{ total_admins }}</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Total Projects</span>
+            <span class="block text-3xl font-black text-purple-600 mt-1">{{ total_projects }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

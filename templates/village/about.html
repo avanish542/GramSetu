@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}About {{ village.name|default:DEMO_VILLAGE_NAME }} – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header Card -->
+    <div class="bg-gradient-to-r from-civic-800 to-civic-900 text-white rounded-3xl p-8 sm:p-12 mb-12 shadow-xl">
+        <div class="max-w-4xl space-y-4">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="bg-civic-600/70 text-green-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Gram Panchayat Profile</span>
+                <span class="bg-yellow-500/30 text-yellow-200 border border-yellow-400/40 text-xs font-semibold px-3 py-1 rounded-full"><i class="fas fa-user-shield mr-1"></i> Sarpanch / Pradhan: MOHANLAL</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black">Welcome to {{ village.name|default:'Tenuhari (Shukla)' }}</h1>
+            <p class="text-green-300 font-medium text-sm sm:text-base">
+                <i class="fas fa-map-marker-alt mr-1"></i> Tenuhari (Shukla), Sahjanwa, Gorakhpur, Uttar Pradesh - 273209
+            </p>
+            <p class="text-gray-200 text-sm sm:text-base font-light leading-relaxed">
+                {{ village.history|default:"Tenuhari (Shukla) is an active Gram Panchayat located in Sahjanwa Tehsil, Gorakhpur District, Uttar Pradesh (PIN 273209). Dedicated to transparent governance, progressive rural infrastructure, and citizen services." }}
+            </p>
+            <div class="pt-4 flex flex-wrap gap-4 text-xs font-semibold">
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg">Tehsil: {{ village.block|default:'Sahjanwa' }}</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg">District: {{ village.district|default:'Gorakhpur' }}</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg">State: {{ village.state|default:'Uttar Pradesh' }}</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg">PIN Code: {{ village.pincode|default:'273209' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demographics Cards Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <i class="fas fa-users text-civic-700 text-3xl mb-2"></i>
+            <span class="block text-2xl font-extrabold text-gray-900">{{ village.population|default:5800 }}</span>
+            <span class="text-xs text-gray-500 font-medium">Total Population</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <i class="fas fa-home text-blue-600 text-3xl mb-2"></i>
+            <span class="block text-2xl font-extrabold text-gray-900">{{ village.households|default:950 }}</span>
+            <span class="text-xs text-gray-500 font-medium">Total Households</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <i class="fas fa-map-marked-alt text-yellow-600 text-3xl mb-2"></i>
+            <span class="block text-2xl font-extrabold text-gray-900">{{ village.total_wards|default:6 }}</span>
+            <span class="text-xs text-gray-500 font-medium">Gram Panchayat Wards</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <i class="fas fa-bolt text-purple-600 text-3xl mb-2"></i>
+            <span class="block text-2xl font-extrabold text-gray-900">{{ info.electricity_coverage_percent|default:97.50 }}%</span>
+            <span class="text-xs text-gray-500 font-medium">Electricity Coverage</span>
+        </div>
+    </div>
+
+    <!-- Wards Information Section -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Wards & Elected Representatives</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for ward in wards %}
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:border-civic-500 transition">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="bg-civic-100 text-civic-800 text-xs font-bold px-3 py-1 rounded-full">Ward {{ ward.ward_number }}</span>
+                        <span class="text-xs text-gray-500 font-medium">{{ ward.population }} Residents</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">{{ ward.ward_name }}</h3>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p><i class="fas fa-user text-gray-400 mr-2"></i> Representative: <span class="font-semibold text-gray-800">{{ ward.representative_name }}</span></p>
+                        <p><i class="fas fa-phone text-gray-400 mr-2"></i> Contact: {{ ward.representative_phone }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Village Conditions Assessment (Part 6) -->
+    <div class="mb-12">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-extrabold text-gray-900">Village Infrastructure & Development Conditions</h2>
+                <p class="text-xs text-gray-500 mt-1">Status of key public amenities and sector assessments</p>
+            </div>
+            <span class="bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-lg font-semibold">
+                <i class="fas fa-info-circle mr-1"></i> Demo Data / Sample Assessment
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for cond in conditions %}
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-sm text-gray-900">{{ cond.category }}</span>
+                            {% if cond.condition_status == 'GOOD' %}
+                                <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-1 rounded-full">GOOD</span>
+                            {% elif cond.condition_status == 'MODERATE' %}
+                                <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2.5 py-1 rounded-full">MODERATE</span>
+                            {% elif cond.condition_status == 'NEEDS_ATTENTION' %}
+                                <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2.5 py-1 rounded-full">NEEDS ATTENTION</span>
+                            {% else %}
+                                <span class="bg-red-100 text-red-800 text-[10px] font-bold px-2.5 py-1 rounded-full">CRITICAL</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed mb-3">{{ cond.description }}</p>
+                    </div>
+                    <div class="text-[10px] text-gray-400 border-t border-gray-100 pt-2 flex justify-between">
+                        <span>Source: {{ cond.source }}</span>
+                        <span>Verified: {% if cond.verified %}Yes{% else %}No (Sample){% endif %}</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-3 text-center py-8 text-gray-500 text-sm">
+                    No condition assessments recorded yet.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Related Panchayats / Sahjanwa Block Locations (Part 5) -->
+    <div class="mb-12">
+        <div class="mb-6">
+            <h2 class="text-2xl font-extrabold text-gray-900">Sahjanwa Block Panchayats & Related Locations</h2>
+            <p class="text-xs text-gray-500 mt-1">Official Sahjanwa block administrative structure (Gorakhpur District Administration)</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for item in related_panchayats %}
+                    <div class="p-3.5 rounded-xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-civic-300 transition">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-sm text-gray-900">{{ item.name }}</h4>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded
+                                {% if item.category == 'PRIMARY_GP' %}bg-green-100 text-green-800
+                                {% elif item.category == 'REVENUE_VILLAGE' %}bg-blue-100 text-blue-800
+                                {% else %}bg-gray-200 text-gray-700{% endif %}">
+                                {{ item.get_category_display }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 mt-1">{{ item.notes }}</p>
+                        {% if item.distance_km %}
+                            <span class="text-[10px] text-gray-400 block mt-1"><i class="fas fa-road mr-1"></i> Approx {{ item.distance_km }} km from Tenuhari</span>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="text-xs text-gray-500 col-span-3">No related Panchayats listed.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Public Infrastructure Overview -->
+    {% if info %}
+    <div class="bg-gray-100 rounded-3xl p-8 border border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Public Infrastructure Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+            <div>
+                <h4 class="font-bold text-gray-900 mb-1"><i class="fas fa-tint text-blue-600 mr-2"></i> Drinking Water Facilities</h4>
+                <p class="text-xs text-gray-600">{{ info.water_facilities_overview }}</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-gray-900 mb-1"><i class="fas fa-trash-alt text-green-600 mr-2"></i> Waste Management System</h4>
+                <p class="text-xs text-gray-600">{{ info.waste_management_overview }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Government Welfare Schemes – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">Government Welfare Schemes</h1>
+        <p class="text-sm text-gray-600 mt-1">Explore housing, agriculture, pension, education, and health schemes available for rural citizens.</p>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="flex space-x-2 overflow-x-auto pb-4 mb-8 text-xs font-semibold scrollbar-none">
+        <a href="{% url 'schemes:list' %}" class="px-4 py-2 rounded-xl whitespace-nowrap transition {% if not selected_category %}bg-civic-700 text-white shadow{% else %}bg-white border text-gray-700 hover:bg-gray-50{% endif %}">
+            All Categories
+        </a>
+        {% for code, name in categories %}
+            <a href="?category={{ code }}" class="px-4 py-2 rounded-xl whitespace-nowrap transition {% if selected_category == code %}bg-civic-700 text-white shadow{% else %}bg-white border text-gray-700 hover:bg-gray-50{% endif %}">
+                {{ name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Schemes Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        {% for scheme in schemes %}
+            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="bg-purple-100 text-purple-800 text-[11px] font-bold px-3 py-1 rounded-full uppercase">{{ scheme.category }}</span>
+                        <span class="text-xs text-gray-500 font-medium">{{ scheme.department }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 line-clamp-1">{{ scheme.name }}</h3>
+                    <p class="text-xs text-gray-600 line-clamp-3 mt-2 leading-relaxed">{{ scheme.description }}</p>
+                </div>
+
+                <div class="border-t pt-4 space-y-3">
+                    <a href="{% url 'schemes:detail' scheme.pk %}" class="block text-center w-full bg-civic-700 hover:bg-civic-800 text-white font-bold text-xs py-2.5 rounded-lg transition shadow-sm">
+                        View Eligibility & Benefits
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-3 text-center py-12 text-gray-500">No schemes found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

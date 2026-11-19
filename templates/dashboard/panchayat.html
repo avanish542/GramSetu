@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Panchayat Operational Dashboard – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="bg-gray-900 text-white rounded-3xl p-8 mb-8 shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <span class="bg-civic-600 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase">Panchayat Administration</span>
+            <h1 class="text-2xl sm:text-3xl font-extrabold mt-2">{{ DEMO_VILLAGE_NAME }} Operations Dashboard</h1>
+            <p class="text-xs text-gray-400 mt-1">Logged in as Sarpanch MOHANLAL / Panchayat Administrator • {{ DEMO_PANCHAYAT_NAME }}</p>
+        </div>
+        <div class="flex space-x-2">
+            <a href="/admin/" target="_blank" class="bg-civic-700 hover:bg-civic-800 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">
+                <i class="fas fa-cog mr-1"></i> Django Admin Desk
+            </a>
+        </div>
+    </div>
+
+    <!-- SaaS Stats Counters Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Villagers</span>
+            <span class="block text-2xl font-black text-gray-900 mt-1">{{ total_villagers }}</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Total Projects</span>
+            <span class="block text-2xl font-black text-blue-600 mt-1">{{ total_projects }}</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Approved Budget</span>
+            <span class="block text-2xl font-black text-civic-700 mt-1">₹{{ total_budget|floatformat:0 }}</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="text-xs text-gray-500 font-bold uppercase">Pending Complaints</span>
+            <span class="block text-2xl font-black text-yellow-600 mt-1">{{ pending_complaints }}</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center col-span-2 lg:col-span-1">
+            <span class="text-xs text-gray-500 font-bold uppercase">Pending Applications</span>
+            <span class="block text-2xl font-black text-purple-600 mt-1">{{ pending_verification_apps }}</span>
+        </div>
+    </div>
+
+    <!-- Operational Queues Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Queue 1: Pending Applications Verification -->
+        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-gray-900">Pending Application Verification Desk</h3>
+                <a href="{% url 'applications:my_applications' %}" class="text-xs text-civic-700 font-bold">Manage All →</a>
+            </div>
+            <div class="space-y-3">
+                {% for app in recent_applications %}
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-gray-900 block">{{ app.service.name }}</span>
+                            <span class="text-gray-500">Applicant: {{ app.applicant_name }} ({{ app.application_number }})</span>
+                        </div>
+                        <a href="{% url 'applications:detail' app.pk %}" class="bg-civic-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px]">Verify Docs</a>
+                    </div>
+                {% empty %}
+                    <p class="text-xs text-gray-500">No applications pending verification.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Queue 2: Active Complaints Queue -->
+        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-gray-900">Active Complaints Queue</h3>
+                <a href="{% url 'complaints:my_complaints' %}" class="text-xs text-civic-700 font-bold">Manage All →</a>
+            </div>
+            <div class="space-y-3">
+                {% for cmp in recent_complaints %}
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-gray-900 block line-clamp-1">{{ cmp.title }}</span>
+                            <span class="text-gray-500">{{ cmp.ticket_number }} • Ward: {{ cmp.ward.ward_name }}</span>
+                        </div>
+                        <a href="{% url 'complaints:detail' cmp.pk %}" class="bg-civic-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px]">Update Status</a>
+                    </div>
+                {% empty %}
+                    <p class="text-xs text-gray-500">No pending complaints.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

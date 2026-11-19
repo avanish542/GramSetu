@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Contact Gram Panchayat – GramSetu V2{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-6">Contact {{ DEMO_PANCHAYAT_NAME }}</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+        <div class="space-y-4">
+            <h3 class="text-lg font-bold text-gray-900">Office Location</h3>
+            <p class="text-sm text-gray-600">Gram Panchayat Bhawan, {{ DEMO_VILLAGE_NAME }}<br>Tehsil: {{ DEMO_BLOCK }}, District: {{ DEMO_DISTRICT }}<br>State: {{ DEMO_STATE }} - {{ DEMO_PINCODE }}<br>Gram Pradhan / Sarpanch: {{ DEMO_SARPANCH }}</p>
+            
+            <h3 class="text-lg font-bold text-gray-900 pt-4">Contact Channels</h3>
+            <p class="text-sm text-gray-600"><i class="fas fa-headset mr-2 text-civic-700"></i> Panchayat Helpdesk</p>
+            <p class="text-sm text-gray-600"><i class="fas fa-envelope mr-2 text-civic-700"></i> Email: admin@tenuharipanchayat.in</p>
+            <p class="text-sm text-gray-600"><i class="fas fa-clock mr-2 text-civic-700"></i> Working Hours: Mon - Sat (10:00 AM - 5:00 PM)</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 class="text-base font-bold text-gray-900 mb-3">Send a Direct Inquiry</h3>
+            <form class="space-y-3">
+                <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border rounded-lg text-sm">
+                <input type="email" placeholder="Email Address" class="w-full px-4 py-2 border rounded-lg text-sm">
+                <textarea placeholder="Message..." rows="3" class="w-full px-4 py-2 border rounded-lg text-sm"></textarea>
+                <button type="button" class="w-full bg-civic-700 text-white font-bold py-2 rounded-lg text-sm">Send Inquiry</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

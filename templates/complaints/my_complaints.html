@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}My Complaints – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900">
+                {% if user.is_panchayat_admin %}Panchayat Complaint Management Queue{% else %}My Submitted Complaints{% endif %}
+            </h1>
+            <p class="text-sm text-gray-600 mt-1">Track the resolution status of registered civic complaints.</p>
+        </div>
+        <a href="{% url 'complaints:submit' %}" class="bg-civic-700 hover:bg-civic-800 text-white font-bold px-6 py-2.5 rounded-xl shadow text-sm flex items-center space-x-2">
+            <i class="fas fa-plus"></i>
+            <span>Submit New Complaint</span>
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="GET" class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Search by Ticket ID or title..." class="w-full px-3 py-2 border rounded-lg text-sm">
+        </div>
+        <div>
+            <select name="status" class="w-full px-3 py-2 border rounded-lg text-sm">
+                <option value="">All Statuses</option>
+                {% for code, name in status_choices %}
+                    <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex items-end space-x-2">
+            <button type="submit" class="bg-civic-700 text-white font-bold px-6 py-2 rounded-lg text-sm">Filter</button>
+            <a href="{% url 'complaints:my_complaints' %}" class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm">Reset</a>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-700">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                    <tr>
+                        <th class="py-3 px-4">Ticket ID</th>
+                        <th class="py-3 px-4">Category</th>
+                        <th class="py-3 px-4">Title</th>
+                        <th class="py-3 px-4">Ward</th>
+                        <th class="py-3 px-4">Priority</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for cmp in complaints %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-3 px-4 font-mono font-bold text-civic-700">{{ cmp.ticket_number }}</td>
+                            <td class="py-3 px-4 text-xs font-semibold">{{ cmp.category.name }}</td>
+                            <td class="py-3 px-4 font-medium text-gray-900 line-clamp-1">{{ cmp.title }}</td>
+                            <td class="py-3 px-4 text-xs text-gray-500">{{ cmp.ward.ward_name|default:'N/A' }}</td>
+                            <td class="py-3 px-4">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded
+                                    {% if cmp.priority == 'URGENT' %}bg-red-100 text-red-700
+                                    {% elif cmp.priority == 'HIGH' %}bg-orange-100 text-orange-700
+                                    {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                    {{ cmp.get_priority_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full text-white
+                                    {% if cmp.status == 'RESOLVED' %}bg-green-600
+                                    {% elif cmp.status == 'IN_PROGRESS' %}bg-yellow-500
+                                    {% else %}bg-blue-600{% endif %}">
+                                    {{ cmp.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <a href="{% url 'complaints:detail' cmp.pk %}" class="text-xs font-bold text-civic-700 hover:underline">View Ticket →</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="text-center py-8 text-gray-500">No complaint tickets found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

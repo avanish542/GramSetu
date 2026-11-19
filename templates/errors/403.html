@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Access Denied (403) – GramSetu V2{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-20 text-center space-y-4">
+    <div class="w-16 h-16 bg-yellow-100 text-yellow-600 font-bold rounded-2xl flex items-center justify-center mx-auto text-2xl">403</div>
+    <h1 class="text-2xl font-black text-gray-900">Access Denied</h1>
+    <p class="text-xs text-gray-600">You do not have administrative permissions or ownership authorization to view this document or page.</p>
+    <a href="{% url 'core:home' %}" class="inline-block bg-civic-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow">Return to Home</a>
+</div>
+{% endblock %}

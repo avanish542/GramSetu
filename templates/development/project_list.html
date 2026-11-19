@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Village Development Projects – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Title & Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">Village Development Projects</h1>
+        <p class="text-sm text-gray-600 mt-1">Track infrastructure works, budgets, progress, and photos across all wards in {{ DEMO_VILLAGE_NAME }}.</p>
+    </div>
+
+    <!-- Category Navigation Pills -->
+    <div class="flex space-x-2 overflow-x-auto pb-4 mb-8 text-xs font-semibold scrollbar-none">
+        <a href="{% url 'development:list' %}" class="px-4 py-2 rounded-xl whitespace-nowrap transition {% if not category %}bg-civic-700 text-white shadow{% else %}bg-white border text-gray-700 hover:bg-gray-50{% endif %}">
+            All Categories
+        </a>
+        {% for cat in categories %}
+            <a href="{% url 'development:category_list' cat.slug %}" class="px-4 py-2 rounded-xl whitespace-nowrap transition {% if category and category.slug == cat.slug %}bg-civic-700 text-white shadow{% else %}bg-white border text-gray-700 hover:bg-gray-50{% endif %}">
+                {{ cat.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <form method="GET" class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Search Project</label>
+            <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Search by name..." class="w-full px-3 py-2 border rounded-lg text-sm">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Filter</label>
+            <select name="status" class="w-full px-3 py-2 border rounded-lg text-sm">
+                <option value="">All Statuses</option>
+                {% for code, name in status_choices %}
+                    <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="md:col-span-2 flex items-end space-x-2">
+            <button type="submit" class="bg-civic-700 hover:bg-civic-800 text-white font-bold px-6 py-2 rounded-lg text-sm shadow">Filter Projects</button>
+            <a href="{% url 'development:list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm">Reset</a>
+        </div>
+    </form>
+
+    <!-- Projects Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        {% for project in projects %}
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
+                <div class="bg-gray-100 h-44 relative flex items-center justify-center text-gray-400">
+                    {% if project.images.first %}
+                        <img src="{{ project.images.first.image.url }}" alt="{{ project.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-hard-hat text-4xl"></i>
+                    {% endif %}
+                    <span class="absolute top-3 right-3 text-[11px] font-bold px-3 py-1 rounded-full shadow text-white
+                        {% if project.status == 'COMPLETED' %}bg-green-600{% elif project.status == 'IN_PROGRESS' %}bg-yellow-500{% else %}bg-blue-600{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                    <span class="absolute bottom-3 left-3 bg-gray-900/80 text-white text-[11px] font-medium px-2.5 py-0.5 rounded">
+                        {{ project.category.name }}
+                    </span>
+                </div>
+                <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-xs text-gray-500 font-mono">{{ project.project_id }} • {{ project.ward.ward_name|default:'All Wards' }}</span>
+                        <h3 class="text-base font-bold text-gray-900 line-clamp-1 mt-0.5">{{ project.name }}</h3>
+                        <p class="text-xs text-gray-600 line-clamp-2 mt-2 leading-relaxed">{{ project.description }}</p>
+                    </div>
+
+                    <div class="space-y-2 border-t border-gray-100 pt-3">
+                        <div class="flex justify-between text-xs text-gray-600">
+                            <span>Progress ({{ project.progress_percentage }}%)</span>
+                            <span class="font-bold">₹{{ project.approved_budget|floatformat:0 }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-civic-600 h-2 rounded-full" style="width: {{ project.progress_percentage }}%"></div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'development:detail' project.pk %}" class="block text-center w-full bg-gray-50 hover:bg-civic-50 text-civic-700 font-semibold text-xs py-2.5 rounded-lg border border-gray-200 transition">
+                        View Details, Budget & Photos
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-3 text-center py-12 bg-white rounded-2xl border border-gray-200 text-gray-500">
+                <i class="fas fa-folder-open text-4xl text-gray-300 mb-3 block"></i>
+                No projects matched your criteria.
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.has_other_pages %}
+        <div class="flex justify-center space-x-2">
+            {% if projects.has_previous %}
+                <a href="?page={{ projects.previous_page_number }}" class="px-4 py-2 border rounded-lg text-xs font-bold">Previous</a>
+            {% endif %}
+            <span class="px-4 py-2 text-xs font-semibold text-gray-600">Page {{ projects.number }} of {{ projects.paginator.num_pages }}</span>
+            {% if projects.has_next %}
+                <a href="?page={{ projects.next_page_number }}" class="px-4 py-2 border rounded-lg text-xs font-bold">Next</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

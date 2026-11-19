@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Villager Dashboard – GramSetu V2{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Welcome Header -->
+    <div class="bg-gradient-to-r from-civic-800 to-civic-900 text-white rounded-3xl p-8 mb-8 shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span class="bg-civic-700/60 text-green-300 text-xs font-semibold px-3 py-1 rounded-full uppercase">Villager Portal</span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold mt-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                <p class="text-xs text-gray-200 mt-1">Ward: {{ user.ward.ward_name|default:'Ward 1' }} • {{ DEMO_PANCHAYAT_NAME }}</p>
+            </div>
+            <a href="{% url 'services:list' %}" class="bg-white text-civic-900 font-bold px-5 py-2.5 rounded-xl text-xs shadow hover:bg-gray-100 transition">
+                + Apply for Service
+            </a>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-extrabold text-blue-600">{{ pending_apps_count }}</span>
+            <span class="text-xs text-gray-500 font-medium">Pending Applications</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-extrabold text-green-600">{{ approved_apps_count }}</span>
+            <span class="text-xs text-gray-500 font-medium">Approved Services</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-extrabold text-yellow-600">{{ pending_complaints_count }}</span>
+            <span class="text-xs text-gray-500 font-medium">Active Complaints</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+            <span class="block text-2xl font-extrabold text-civic-700">{{ resolved_complaints_count }}</span>
+            <span class="text-xs text-gray-500 font-medium">Resolved Complaints</span>
+        </div>
+    </div>
+
+    <!-- Quick Action Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+        <a href="{% url 'services:list' %}" class="p-4 bg-white rounded-2xl border border-gray-200 text-center hover:border-civic-500 transition shadow-sm">
+            <i class="fas fa-file-invoice text-civic-700 text-2xl mb-2"></i>
+            <span class="block text-xs font-bold text-gray-900">Apply for Service</span>
+        </a>
+        <a href="{% url 'complaints:submit' %}" class="p-4 bg-white rounded-2xl border border-gray-200 text-center hover:border-civic-500 transition shadow-sm">
+            <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mb-2"></i>
+            <span class="block text-xs font-bold text-gray-900">Submit Complaint</span>
+        </a>
+        <a href="{% url 'development:list' %}" class="p-4 bg-white rounded-2xl border border-gray-200 text-center hover:border-civic-500 transition shadow-sm">
+            <i class="fas fa-hard-hat text-blue-600 text-2xl mb-2"></i>
+            <span class="block text-xs font-bold text-gray-900">Track Development</span>
+        </a>
+        <a href="{% url 'infrastructure:map' %}" class="p-4 bg-white rounded-2xl border border-gray-200 text-center hover:border-civic-500 transition shadow-sm">
+            <i class="fas fa-map-marked-alt text-purple-600 text-2xl mb-2"></i>
+            <span class="block text-xs font-bold text-gray-900">Village Map</span>
+        </a>
+    </div>
+
+    <!-- My Applications & Complaints Preview -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-base font-bold text-gray-900">Recent Service Applications</h3>
+                <a href="{% url 'applications:my_applications' %}" class="text-xs text-civic-700 font-bold">View All →</a>
+            </div>
+            <div class="space-y-3">
+                {% for app in my_applications %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs">
+                        <div>
+                            <span class="font-bold text-gray-900 block">{{ app.service.name }}</span>
+                            <span class="text-gray-400 font-mono">{{ app.application_number }}</span>
+                        </div>
+                        <span class="font-bold px-2 py-0.5 rounded text-[10px] text-white
+                            {% if app.status == 'APPROVED' %}bg-green-600{% elif app.status == 'REJECTED' %}bg-red-600{% else %}bg-yellow-500{% endif %}">
+                            {{ app.get_status_display }}
+                        </span>
+                    </div>
+                {% empty %}
+                    <p class="text-xs text-gray-500">No applications submitted yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-base font-bold text-gray-900">Recent Registered Complaints</h3>
+                <a href="{% url 'complaints:my_complaints' %}" class="text-xs text-civic-700 font-bold">View All →</a>
+            </div>
+            <div class="space-y-3">
+                {% for cmp in my_complaints %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs">
+                        <div>
+                            <span class="font-bold text-gray-900 block line-clamp-1">{{ cmp.title }}</span>
+                            <span class="text-gray-400 font-mono">{{ cmp.ticket_number }}</span>
+                        </div>
+                        <span class="font-bold px-2 py-0.5 rounded text-[10px] text-white
+                            {% if cmp.status == 'RESOLVED' %}bg-green-600{% elif cmp.status == 'IN_PROGRESS' %}bg-yellow-500{% else %}bg-blue-600{% endif %}">
+                            {{ cmp.get_status_display }}
+                        </span>
+                    </div>
+                {% empty %}
+                    <p class="text-xs text-gray-500">No complaints submitted yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

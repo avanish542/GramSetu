@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}GramSetu – A Digital Bridge Between Panchayat & People{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-civic-900 via-civic-800 to-civic-950 text-white py-16 lg:py-24 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7 space-y-6">
+                <div class="inline-flex items-center space-x-2 bg-civic-700/60 text-green-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-civic-500/30">
+                    <i class="fas fa-certificate text-green-400"></i>
+                    <span>Official {{ DEMO_VILLAGE_NAME }} Digital Governance Portal</span>
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                    GramSetu – A Digital Bridge Between <span class="text-green-400">Panchayat & People</span>
+                </h1>
+                <p class="text-base sm:text-lg text-gray-200 leading-relaxed font-light">
+                    Track village development projects, apply for public certificates online, register civic complaints, explore welfare schemes, and monitor budget expenditure in real-time.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="{% url 'village:about' %}" class="bg-white text-civic-900 font-bold px-6 py-3.5 rounded-xl shadow hover:bg-gray-100 transition text-sm flex items-center space-x-2">
+                        <i class="fas fa-eye text-civic-700"></i>
+                        <span>Explore Village</span>
+                    </a>
+                    <a href="{% url 'development:list' %}" class="bg-civic-600 hover:bg-civic-500 text-white font-bold px-6 py-3.5 rounded-xl shadow transition text-sm flex items-center space-x-2 border border-civic-400/40">
+                        <i class="fas fa-hard-hat"></i>
+                        <span>View Development</span>
+                    </a>
+                    <a href="{% url 'complaints:submit' %}" class="bg-ocean-700 hover:bg-ocean-600 text-white font-bold px-6 py-3.5 rounded-xl shadow transition text-sm flex items-center space-x-2">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Submit Complaint</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl text-white">
+                    <h3 class="text-lg font-bold mb-4 flex items-center space-x-2 border-b border-white/20 pb-3">
+                        <i class="fas fa-chart-line text-green-400"></i>
+                        <span>Gram Panchayat Overview</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-300">Panchayat Name</span>
+                            <span class="font-semibold">{{ DEMO_PANCHAYAT_NAME }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-300">Block / District</span>
+                            <span class="font-semibold">{{ DEMO_BLOCK }}, {{ DEMO_DISTRICT }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-300">State</span>
+                            <span class="font-semibold">{{ DEMO_STATE }}</span>
+                        </div>
+                        <div class="border-t border-white/20 pt-3 mt-3 grid grid-cols-2 gap-3 text-center">
+                            <div class="bg-white/10 p-3 rounded-lg">
+                                <span class="block text-2xl font-bold text-green-400">{{ stats.total_villagers }}</span>
+                                <span class="text-[11px] text-gray-300">Registered Citizens</span>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-lg">
+                                <span class="block text-2xl font-bold text-yellow-400">{{ stats.active_schemes }}</span>
+                                <span class="text-[11px] text-gray-300">Active Schemes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic Counter Statistics -->
+<section class="py-10 bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-users text-civic-700 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.total_villagers }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Villagers</div>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-project-diagram text-blue-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.total_projects }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Total Projects</div>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-check-circle text-green-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.completed_projects }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Completed</div>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-spinner text-yellow-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.ongoing_projects }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">In Progress</div>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-wrench text-indigo-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.resolved_complaints }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Complaints Fixed</div>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <i class="fas fa-hands-helping text-purple-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-extrabold text-gray-900">{{ stats.active_schemes }}</div>
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Govt Schemes</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects Section -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
+            <div>
+                <span class="text-civic-700 font-bold text-xs uppercase tracking-widest">Village Development</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">Featured Ongoing & Completed Projects</h2>
+            </div>
+            <a href="{% url 'development:list' %}" class="mt-4 md:mt-0 text-sm font-semibold text-civic-700 hover:text-civic-800 flex items-center space-x-1">
+                <span>View All Projects</span>
+                <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for project in featured_projects %}
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
+                    <div class="bg-gray-100 h-44 relative flex items-center justify-center text-gray-400">
+                        {% if project.images.first %}
+                            <img src="{{ project.images.first.image.url }}" alt="{{ project.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <i class="fas fa-hard-hat text-4xl"></i>
+                        {% endif %}
+                        <span class="absolute top-3 right-3 text-[11px] font-bold px-3 py-1 rounded-full shadow text-white
+                            {% if project.status == 'COMPLETED' %}bg-green-600{% elif project.status == 'IN_PROGRESS' %}bg-yellow-500{% else %}bg-blue-600{% endif %}">
+                            {{ project.get_status_display }}
+                        </span>
+                        <span class="absolute bottom-3 left-3 bg-gray-900/80 text-white text-[11px] font-medium px-2.5 py-0.5 rounded">
+                            {{ project.category.name }}
+                        </span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-gray-500 font-mono">{{ project.project_id }}</span>
+                            <h3 class="text-base font-bold text-gray-900 line-clamp-1 mt-0.5">{{ project.name }}</h3>
+                            <p class="text-xs text-gray-600 line-clamp-2 mt-2 leading-relaxed">{{ project.description }}</p>
+                        </div>
+
+                        <div class="space-y-2 border-t border-gray-100 pt-3">
+                            <div class="flex justify-between text-xs text-gray-600">
+                                <span>Progress ({{ project.progress_percentage }}%)</span>
+                                <span class="font-bold">₹{{ project.approved_budget|floatformat:0 }} Budget</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-civic-600 h-2 rounded-full" style="width: {{ project.progress_percentage }}%"></div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'development:detail' project.pk %}" class="block text-center w-full bg-gray-50 hover:bg-civic-50 text-civic-700 font-semibold text-xs py-2.5 rounded-lg border border-gray-200 transition">
+                            View Project Details & Timeline
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-3 text-center py-12 text-gray-500">No development projects found.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Latest Notices & Announcements -->
+<section class="py-16 bg-white border-t border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <span class="text-civic-700 font-bold text-xs uppercase tracking-widest">Panchayat Communication</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">Latest Notices & Gram Sabha Announcements</h2>
+            </div>
+            <a href="{% url 'notices:list' %}" class="text-sm font-semibold text-civic-700 hover:text-civic-800">View All Notices →</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for notice in latest_notices %}
+                <div class="p-6 rounded-2xl border border-gray-200 bg-gray-50/50 hover:bg-white transition shadow-sm flex space-x-4 items-start">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-lg font-bold
+                        {% if notice.is_pinned %}bg-red-100 text-red-600{% else %}bg-civic-100 text-civic-700{% endif %}">
+                        <i class="fas {% if notice.is_pinned %}fa-thumbtack{% else %}fa-bullhorn{% endif %}"></i>
+                    </div>
+                    <div class="space-y-1 flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-civic-700 uppercase tracking-wider">{{ notice.get_category_display }}</span>
+                            <span class="text-xs text-gray-500">{{ notice.published_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-gray-900 leading-snug">
+                            <a href="{% url 'notices:detail' notice.pk %}" class="hover:text-civic-700 transition">{{ notice.title }}</a>
+                        </h3>
+                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed">{{ notice.description }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-2 text-center py-8 text-gray-500">No recent notices.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
